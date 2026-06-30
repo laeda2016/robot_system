@@ -1,0 +1,33 @@
+<launch>
+    <!-- Камера -->
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="/dev/video0" />
+        <param name="image_width" value="640" />
+        <param name="image_height" value="480" />
+        <param name="pixel_format" value="yuyv" />
+    </node>
+
+    <!-- Лидар RPLIDAR -->
+    <node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
+        <param name="serial_port" value="/dev/ttyUSB0" />
+        <param name="serial_baudrate" value="115200" />
+        <param name="frame_id" value="laser" />
+        <param name="inverted" value="false" />
+        <param name="angle_compensate" value="true" />
+    </node>
+
+    <!-- IMU BNO055 -->
+    <node name="bno055_node" pkg="imu_bno055" type="bno055_node" output="screen">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="frame_id" value="imu" />
+    </node>
+
+    <!-- GPS (симуляция или реальный) -->
+    <node name="nmea_serial" pkg="nmea_navsat_driver" type="nmea_serial_driver" output="screen">
+        <param name="port" value="/dev/ttyACM1" />
+        <param name="baud" value="4800" />
+    </node>
+
+    <!-- Наш сборщик -->
+    <node name="sensor_collector" pkg="sensor_collector" type="collector.py" output="screen" />
+</launch>

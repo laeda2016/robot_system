@@ -1,0 +1,37 @@
+version: '3'
+services:
+  ros-master:
+    image: ros:noetic-ros-core
+    command: roscore
+    networks:
+      - rosnet
+
+  robot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: robot_container
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/tmp/.docker.xauth
+      - ROS_MASTER_URI=http://ros-master:11311
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - $XAUTH:/tmp/.docker.xauth:rw
+      - ../src:/root/catkin_ws/src
+      - ../config:/root/config
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/video0:/dev/video0
+    command: /bin/bash -c "source /root/catkin_ws/devel/setup.bash && tail -f /dev/null"
+    depends_on:
+      - ros-master
+    networks:
+      - rosnet
+
+networks:
+  rosnet:
+    driver: bridge
